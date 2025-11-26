@@ -6,7 +6,7 @@
       "model": "openai/gpt-oss-120b",
       "api_key_env": "OPENAI_API_KEY",
       "base_url": "https://integrate.api.nvidia.com/v1",
-      "stream": false
+      "stream": true
     }
   },
   "image": {

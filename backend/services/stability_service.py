@@ -10,6 +10,9 @@ from typing import Optional
 from pathlib import Path
 import time
 import hashlib
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

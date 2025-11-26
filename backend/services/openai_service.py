@@ -3,6 +3,7 @@ openai_service.py
 
 Refactored OpenAIService to support NVIDIA's GPT-OSS style endpoint / client.
 Compatible with the sample integrator usage:
+  from openai import OpenAI
   client = OpenAI(base_url="https://integrate.api.nvidia.com/v1", api_key="...")
   model="openai/gpt-oss-120b"
 """
@@ -11,8 +12,11 @@ import os
 import logging
 from typing import Optional
 import asyncio
+from dotenv import load_dotenv
 
 from openai import OpenAI
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +42,15 @@ class OpenAIService:
         self.base_url = base_url
         self.stream = stream
         self.client: Optional[OpenAI] = None
+
+
+#  DEBUG
+        import os, logging
+        logger = logging.getLogger(__name__)
+        logger.info("openai_service sees OPENAI_API_KEY set? %s", bool(os.getenv("OPENAI_API_KEY")))
+        logger.info("openai_service sees OPENAI_BASE_URL: %s", os.getenv("OPENAI_BASE_URL"))
+
+
 
         if self.api_key:
             try:
@@ -169,57 +182,94 @@ Write a formal, informative summary about the eating patterns and nutritional ba
             return self._get_fallback_weekly_summary(total_calories, avg_per_day)
 
     # ----- Core request helper -----
-    async def _make_openai_request(self, prompt: str, max_tokens: int = 150, temperature: float = 0.7, top_p: float = 1.0) -> Optional[str]:
+    async def _make_openai_request(
+        self,
+        prompt: str,
+        max_tokens: int = 150,
+        temperature: float = 0.7,
+        top_p: float = 1.0,
+    ) -> Optional[str]:
         """
         Make request to OpenAI / GPT-OSS API.
-        Uses asyncio.to_thread to call blocking SDK in an async-friendly way.
-        Supports streaming (self.stream True) by iterating the returned generator and accumulating `delta` parts.
+    
+        - Uses asyncio.to_thread to call blocking SDK in a thread-safe way.
+        - For streaming: runs the streaming iterator inside a thread, collects only assistant
+          content (ignores reasoning_content), and returns the assembled string.
+        - For non-streaming: calls the API in a thread and extracts assistant content.
         """
         if not self.client:
             return None
-
-        def _sync_call():
-            return self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                stream=self.stream,
-            )
-
+    
         try:
-            result = await asyncio.to_thread(_sync_call)
-
-            # If streaming mode: iterate and collect `delta` pieces
             if self.stream:
-                text_parts = []
+                # Run the streaming call inside a worker thread and collect assistant-only deltas.
+                def _sync_stream_collect():
+                    collected_parts = []
+                    try:
+                        gen = self.client.chat.completions.create(
+                            model=self.model,
+                            messages=[{"role": "user", "content": prompt}],
+                            max_tokens=max_tokens,
+                            temperature=temperature,
+                            top_p=top_p,
+                            stream=True,
+                        )
+                        for chunk in gen:
+                            # ignore reasoning_content; only capture assistant content
+                            delta = chunk.choices[0].delta
+                            content = getattr(delta, "content", None)
+                            if content:
+                                collected_parts.append(content)
+                    except Exception:
+                        # re-raise so outer thread captures/logs
+                        raise
+                    return "".join(collected_parts).strip() or None
+    
                 try:
-                    for chunk in result:
-                        # chunk.choices[0].delta may have .content and/or .reasoning_content
-                        delta = chunk.choices[0].delta
-                        reasoning = getattr(delta, "reasoning_content", None)
-                        content = getattr(delta, "content", None)
-                        if reasoning:
-                            text_parts.append(reasoning)
-                        if content is not None:
-                            text_parts.append(content)
-                except Exception as e:
-                    logger.warning(f"Streaming iteration error: {e}")
-                return "".join(text_parts).strip() or None
-
-            # Non-streaming: try to extract message content
-            try:
-                return result.choices[0].message.content
-            except Exception:
-                try:
-                    return getattr(result.choices[0], "text", None)
+                    result_text = await asyncio.to_thread(_sync_stream_collect)
+                    return result_text
                 except Exception:
+                    logger.exception("❌ OpenAI streaming request failed:")
                     return None
-
-        except Exception as e:
-            logger.error(f"❌ OpenAI API request failed: {e}")
+    
+            else:
+                # Non-streaming path: make the request in a thread and extract assistant message
+                def _sync_nonstream_call():
+                    return self.client.chat.completions.create(
+                        model=self.model,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        stream=False,
+                    )
+    
+                try:
+                    resp = await asyncio.to_thread(_sync_nonstream_call)
+    
+                    # Prefer the standard assistant content location
+                    msg = getattr(resp.choices[0], "message", None)
+                    content = getattr(msg, "content", None) if msg is not None else None
+                    if content:
+                        return content.strip()
+    
+                    # Fallback: some SDKs put text directly on the choice
+                    text = getattr(resp.choices[0], "text", None)
+                    if text:
+                        return text.strip()
+    
+                    logger.warning("OpenAI non-stream response had no usable content; response repr logged.")
+                    logger.debug("Full non-stream response: %s", repr(resp))
+                    return None
+                except Exception:
+                    logger.exception("❌ OpenAI API request failed:")
+                    return None
+    
+        except Exception:
+            # catch-all for unexpected failures
+            logger.exception("❌ Unexpected error in _make_openai_request:")
             return None
+
 
     # ----- Fallback methods (unchanged) -----
     def _get_fallback_bhai_caption(self, dish: str, calories: int) -> str:
