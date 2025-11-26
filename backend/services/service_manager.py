@@ -31,34 +31,53 @@ class ServiceManager:
         except Exception as e:
             logger.error(f"❌ Failed to load model_routes.json: {e}")
             return {}
-    
+
+            
     def _initialize_services(self):
         """Initialize external API services"""
         try:
-            # Initialize OpenAI service
-            openai_config = self.model_routes.get("caption", {}).get("external_config", {})
+            # ----- OpenAI / caption service init (supports GPT-OSS style) -----
+            openai_route = self.model_routes.get("caption", {}) or {}
+            openai_config = openai_route.get("external_config", {})
+
+            # which env var holds the API key (default to OPENAI_API_KEY)
             api_key_env = openai_config.get("api_key_env", "OPENAI_API_KEY")
-            model = openai_config.get("model", "gpt-4o-mini")
-            
+            api_key = os.getenv(api_key_env)
+
+            # model id (default to GPT-OSS style model id)
+            model = openai_config.get("model", "openai/gpt-oss-120b")
+
+            # optional base_url env var name that points to the integrator base URL
+            base_url_env = openai_config.get("base_url_env")
+            base_url = os.getenv(base_url_env) if base_url_env else openai_config.get("base_url")
+
+            # streaming flag (optional boolean in config)
+            stream_flag = bool(openai_config.get("stream", False))
+
             self.openai_service = OpenAIService(
-                api_key=os.getenv(api_key_env),
-                model=model
+                api_key=api_key,
+                model=model,
+                base_url=base_url,
+                stream=stream_flag
             )
-            
-            # Initialize StabilityAI service
-            stability_config = self.model_routes.get("image", {}).get("external_config", {})
-            api_key_env = stability_config.get("api_key_env", "STABILITY_KEY")
+
+            # ----- StabilityAI / image service init (unchanged) -----
+            stability_route = self.model_routes.get("image", {}) or {}
+            stability_config = stability_route.get("external_config", {})
+            stability_api_key_env = stability_config.get("api_key_env", "STABILITY_KEY")
+            stability_api_key = os.getenv(stability_api_key_env)
             engine = stability_config.get("engine", "stable-diffusion-2")
-            
+
             self.stability_service = StabilityAIService(
-                api_key=os.getenv(api_key_env),
+                api_key=stability_api_key,
                 engine=engine
             )
-            
+
             logger.info("✅ All services initialized successfully")
-            
+
         except Exception as e:
             logger.error(f"❌ Service initialization failed: {e}")
+
     
     async def generate_bhai_caption(self, dish: str, calories: int) -> str:
         """Generate bhai-style caption with fallback"""

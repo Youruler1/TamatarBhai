@@ -3,8 +3,10 @@
     "primary": "external",
     "external_api": "openai",
     "external_config": {
-      "model": "gpt-4o-mini",
-      "api_key_env": "OPENAI_API_KEY"
+      "model": "openai/gpt-oss-120b",
+      "api_key_env": "OPENAI_API_KEY",
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "stream": false
     }
   },
   "image": {
