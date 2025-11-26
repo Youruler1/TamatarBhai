@@ -1,0 +1,3 @@
+# Directory for storing generated dish images
+# Images will be saved here by the StabilityAI service
+# Format: {dish_name}_{timestamp}.png

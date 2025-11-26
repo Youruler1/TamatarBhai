@@ -1,0 +1,55 @@
+dish_name,calories,meal_type,protein_g,carbs_g,fat_g,description
+Aloo Paratha,320,breakfast,8,45,12,Stuffed potato flatbread
+Rajma,245,lunch,15,35,8,Red kidney beans curry
+Dal Tadka,180,lunch,12,28,6,Tempered lentil curry
+Butter Chicken,400,dinner,25,15,28,Creamy tomato chicken curry
+Roti,80,any,3,15,1,Whole wheat flatbread
+Rice,130,any,3,28,0.5,Steamed basmati rice
+Chole,220,lunch,12,32,7,Spiced chickpea curry
+Palak Paneer,280,lunch,18,12,20,Spinach cottage cheese curry
+Biryani,450,lunch,20,55,18,Fragrant rice with meat/vegetables
+Samosa,150,snack,4,18,8,Fried pastry with filling
+Dosa,168,breakfast,4,32,3,Fermented crepe from south India
+Idli,58,breakfast,2,12,0.5,Steamed rice cake
+Upma,200,breakfast,5,35,6,Semolina porridge
+Poha,250,breakfast,6,45,8,Flattened rice dish
+Paratha,300,breakfast,8,40,12,Layered flatbread
+Naan,262,any,8,45,5,Leavened flatbread
+Kulcha,280,any,9,48,6,Stuffed bread
+Bhatura,400,lunch,10,50,18,Deep fried bread
+Puri,36,any,1,7,1,Small fried bread
+Chapati,104,any,4,18,1,Unleavened flatbread
+Masala Chai,50,any,2,8,2,Spiced tea with milk
+Lassi,180,any,8,20,8,Yogurt based drink
+Mango Lassi,220,any,6,35,6,Sweet mango yogurt drink
+Paneer Tikka,320,snack,20,8,24,Grilled cottage cheese
+Chicken Tikka,250,snack,30,5,12,Grilled chicken pieces
+Seekh Kebab,280,snack,25,3,18,Minced meat skewers
+Tandoori Chicken,200,dinner,35,2,8,Clay oven roasted chicken
+Fish Curry,240,lunch,28,8,12,Spiced fish in gravy
+Prawn Curry,180,lunch,22,6,8,Spiced prawns in gravy
+Mutton Curry,350,dinner,28,8,24,Spiced goat meat curry
+Aloo Gobi,160,lunch,4,25,6,Potato cauliflower curry
+Baingan Bharta,140,lunch,3,18,8,Roasted eggplant mash
+Bhindi Masala,120,lunch,3,15,6,Spiced okra curry
+Karela Sabzi,80,lunch,2,12,4,Bitter gourd curry
+Lauki Sabzi,60,lunch,2,10,2,Bottle gourd curry
+Turai Sabzi,45,lunch,2,8,1,Ridge gourd curry
+Methi Sabzi,90,lunch,4,12,4,Fenugreek leaves curry
+Sarson Saag,150,lunch,6,18,8,Mustard greens curry
+Makki Roti,120,any,4,22,2,Corn flour flatbread
+Bajra Roti,97,any,4,18,1,Pearl millet flatbread
+Jowar Roti,349,any,11,72,4,Sorghum flatbread
+Khichdi,120,any,4,22,2,Rice lentil porridge
+Pulao,280,lunch,8,45,8,Spiced rice dish
+Fried Rice,350,lunch,12,55,12,Stir fried rice
+Hakka Noodles,400,lunch,15,60,12,Indo-Chinese noodles
+Manchurian,320,snack,8,35,15,Indo-Chinese fried balls
+Chow Mein,380,lunch,14,58,10,Stir fried noodles
+Spring Roll,180,snack,6,25,8,Fried vegetable rolls
+Momos,240,snack,10,30,10,Steamed dumplings
+Pav Bhaji,350,snack,8,45,18,Spiced vegetable with bread
+Vada Pav,300,snack,8,40,14,Potato fritter burger
+Misal Pav,280,breakfast,12,38,10,Spiced sprouts with bread
+Dhokla,160,snack,6,28,4,Steamed gram flour cake
+Khandvi,120,snack,5,18,4,Rolled gram flour snack

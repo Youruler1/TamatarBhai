@@ -1,0 +1,18 @@
+{
+  "caption": {
+    "primary": "external",
+    "external_api": "openai",
+    "external_config": {
+      "model": "gpt-4o-mini",
+      "api_key_env": "OPENAI_API_KEY"
+    }
+  },
+  "image": {
+    "primary": "external",
+    "external_api": "stability",
+    "external_config": {
+      "engine": "stable-diffusion-2",
+      "api_key_env": "STABILITY_KEY"
+    }
+  }
+}

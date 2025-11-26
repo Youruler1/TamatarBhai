@@ -1,0 +1,5 @@
+# This file ensures the data directory is tracked by git
+# The data directory will contain:
+# - nutrition_lookup.csv
+# - images/ subdirectory for generated images
+# - SQLite database files

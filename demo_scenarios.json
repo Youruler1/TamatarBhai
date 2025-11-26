@@ -1,0 +1,88 @@
+{
+  "daily_preview_scenarios": [
+    {
+      "dish": "aloo paratha",
+      "meal": "breakfast",
+      "expected_calories": 320,
+      "description": "Popular North Indian breakfast - stuffed flatbread"
+    },
+    {
+      "dish": "butter chicken",
+      "meal": "lunch",
+      "expected_calories": 400,
+      "description": "Rich and creamy chicken curry"
+    },
+    {
+      "dish": "dal tadka",
+      "meal": "dinner",
+      "expected_calories": 180,
+      "description": "Simple and healthy lentil curry"
+    }
+  ],
+  "comparison_scenarios": [
+    {
+      "dishA": "rajma",
+      "dishB": "dal tadka",
+      "expected_difference": 65,
+      "lighter_dish": "dal tadka",
+      "description": "Compare protein-rich rajma vs lighter dal"
+    },
+    {
+      "dishA": "butter chicken",
+      "dishB": "palak paneer",
+      "expected_difference": 180,
+      "lighter_dish": "palak paneer",
+      "description": "Compare rich butter chicken vs healthier palak paneer"
+    },
+    {
+      "dishA": "biryani",
+      "dishB": "khichdi",
+      "expected_difference": 220,
+      "lighter_dish": "khichdi",
+      "description": "Compare festive biryani vs comfort food khichdi"
+    }
+  ],
+  "weekly_scenarios": [
+    {
+      "period": "last_7_days",
+      "description": "Current week analysis",
+      "sample_meals": [
+        {
+          "day": "Monday",
+          "dish": "aloo paratha",
+          "calories": 320
+        },
+        {
+          "day": "Tuesday",
+          "dish": "rajma",
+          "calories": 245
+        },
+        {
+          "day": "Wednesday",
+          "dish": "dal tadka",
+          "calories": 180
+        },
+        {
+          "day": "Thursday",
+          "dish": "butter chicken",
+          "calories": 400
+        },
+        {
+          "day": "Friday",
+          "dish": "biryani",
+          "calories": 380
+        },
+        {
+          "day": "Saturday",
+          "dish": "khichdi",
+          "calories": 160
+        },
+        {
+          "day": "Sunday",
+          "dish": "thali",
+          "calories": 450
+        }
+      ]
+    }
+  ]
+}
