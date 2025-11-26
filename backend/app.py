@@ -291,7 +291,7 @@ async def compare_dishes(
             "meta": {
                 "model": "openai-gpt-4o-mini",
                 "generated_at": datetime.utcnow().isoformat(),
-                "calorie_difference": abs(calories_a - calories_b),
+                "calorie_difference": str((abs(calories_a - calories_b))),
                 "lighter_dish": request.dishA if calories_a < calories_b else request.dishB
             }
         }
@@ -306,6 +306,22 @@ async def compare_dishes(
             detail=f"Failed to compare dishes: {str(e)}"
         )
 
+# module-level helper (place near other helpers / top of file)
+def _parse_date_param(name: str, value: str) -> datetime:
+    """
+    Normalize and parse a date string in YYYY-MM-DD format.
+    Accepts values like 2025-11-01 or "2025-11-01" (with quotes).
+    Raises HTTPException(400) on invalid input.
+    """
+    try:
+        cleaned = value.strip().strip('"').strip("'")
+        return datetime.strptime(cleaned, "%Y-%m-%d")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid date format for '{name}': '{value}'. Use YYYY-MM-DD (e.g. 2025-11-30)."
+        )
+
 
 @app.get("/api/weekly", response_model=WeeklyResponse)
 async def get_weekly_snapshot(
@@ -314,71 +330,62 @@ async def get_weekly_snapshot(
     db: Session = Depends(get_db)
 ):
     """
-    Get weekly snapshot with chart and summary
+    Get weekly snapshot with chart and summary.
+    `start` and `end` are accepted as 'YYYY-MM-DD' (strings). Quotes are tolerated.
     """
     try:
         from services.service_manager import service_manager
         from services.chart_service import chart_service
         from database import UserMeal
-        from datetime import datetime
-        
-        # Validate date format
-        try:
-            start_date = datetime.strptime(start, '%Y-%m-%d')
-            end_date = datetime.strptime(end, '%Y-%m-%d')
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid date format. Use YYYY-MM-DD"
-            )
-        
-        # Query user meals for the date range
+
+        # Parse dates (raises HTTPException with clear message on failure)
+        start_date = _parse_date_param("start", start)
+        end_date = _parse_date_param("end", end)
+
+        # Query user meals for the date range (include end date)
         meals = db.query(UserMeal).filter(
             UserMeal.consumed_at >= start_date,
-            UserMeal.consumed_at <= end_date + timedelta(days=1)  # Include end date
+            UserMeal.consumed_at <= end_date + timedelta(days=1)
         ).all()
-        
+
         # Convert to list of dictionaries
         meal_data = [
             {
-                'dish_name': meal.dish_name,
-                'meal_type': meal.meal_type,
-                'calories': meal.calories,
-                'consumed_at': meal.consumed_at
+                "dish_name": meal.dish_name,
+                "meal_type": meal.meal_type,
+                "calories": meal.calories,
+                "consumed_at": meal.consumed_at
             }
             for meal in meals
         ]
-        
-        # Calculate total calories
-        total_calories = sum(meal['calories'] for meal in meal_data)
-        
-        # Calculate average per day
+
+        # Calculate totals
+        total_calories = sum(m["calories"] for m in meal_data)
         date_diff = (end_date - start_date).days + 1
         avg_per_day = total_calories // date_diff if date_diff > 0 else 0
-        
-        # Generate chart
+
+        # Generate chart (chart_service expects start/end strings in your earlier code)
         chart_url = await chart_service.generate_weekly_chart(meal_data, start, end)
-        
-        # Generate summary
+
+        # Generate summary via service_manager
         date_range_str = f"{start} to {end}"
-        summary = await service_manager.generate_weekly_summary(
-            total_calories, date_range_str, avg_per_day
-        )
-        
-        # Prepare additional statistics
+        summary = await service_manager.generate_weekly_summary(total_calories, date_range_str, avg_per_day)
+
+        # Stats
         meal_count = len(meal_data)
-        unique_dishes = len(set(meal['dish_name'] for meal in meal_data))
-        
+        unique_dishes = len({m["dish_name"] for m in meal_data})
+
         # Most consumed dish
         if meal_data:
             dish_counts = {}
-            for meal in meal_data:
-                dish_counts[meal['dish_name']] = dish_counts.get(meal['dish_name'], 0) + 1
+            for m in meal_data:
+                dish_counts[m["dish_name"]] = dish_counts.get(m["dish_name"], 0) + 1
             most_consumed = max(dish_counts.items(), key=lambda x: x[1])
+            most_consumed_dish, most_consumed_count = most_consumed[0], most_consumed[1]
         else:
-            most_consumed = None
-        
-        # Create response
+            most_consumed_dish, most_consumed_count = None, 0
+
+        # Response
         response_data = {
             "total_calories": total_calories,
             "chart_url": chart_url,
@@ -391,18 +398,19 @@ async def get_weekly_snapshot(
                 "unique_dishes": unique_dishes,
                 "avg_calories_per_day": avg_per_day,
                 "days_in_range": date_diff,
-                "most_consumed_dish": most_consumed[0] if most_consumed else None,
-                "most_consumed_count": most_consumed[1] if most_consumed else 0
-            }
+                "most_consumed_dish": most_consumed_dish,
+                "most_consumed_count": most_consumed_count,
+            },
         }
-        
+
         logger.info(f"✅ Generated weekly snapshot for {start} to {end}: {total_calories} total calories")
         return WeeklyResponse(**response_data)
-        
+
     except HTTPException:
+        # re-raise explicit HTTPExceptions (parse errors etc.)
         raise
     except Exception as e:
-        logger.error(f"Weekly snapshot failed: {e}")
+        logger.exception("Weekly snapshot failed:")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate weekly snapshot: {str(e)}"
@@ -466,13 +474,18 @@ async def add_user_meal(
         from database import UserMeal
         
         # Check if user_meal exists
-        existing_entry = db.query(UserMeal).filter(UserMeal.name == user_meal.name).first()
+        existing_entry = db.query(UserMeal).filter(UserMeal.consumed_at == user_meal.consumed_at).first()
         
         if existing_entry:
             # Update existing user_meal
             existing_entry.dish_name = user_meal.dish_name
             existing_entry.meal_type = user_meal.meal_type
-            existing_entry.calories = user_meal.calories
+            if not user_meal.calories:
+                matching_dish = db.query(Dish).filter_by(name == user_meal.dish_name).first()
+                existing_entry.calories = matching_dish.calories
+            else:
+                existing_entry.calories = user_meal.calories
+            
             existing_entry.consumed_at = user_meal.consumed_at
             message = f"Updated user_meal: {user_meal}"
         else:

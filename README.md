@@ -74,7 +74,7 @@ Static Files              SQLite Database
 ### Tech Stack
 - **Frontend**: React, TypeScript, Vite, TailwindCSS
 - **Backend**: FastAPI, SQLAlchemy, SQLite
-- **AI Services**: OpenAI (gpt-4o-mini), StabilityAI (stable-diffusion-2)
+- **AI Services**: OpenAI (openai/gpt-oss-120b), StabilityAI (stable-diffusion-xl-1024-v1-0)
 - **Charts**: Matplotlib
 - **Containerization**: Docker + Docker Compose
 

@@ -11,14 +11,16 @@ class PreviewRequest(BaseModel):
     """Request model for daily preview generation"""
     dish: str = Field(..., min_length=1, max_length=100, description="Name of the dish")
     meal: str = Field(..., description="Meal type (breakfast, lunch, dinner, snack)")
-    
+
     class Config:
         schema_extra = {
-            "example": {
-                "dish": "aloo paratha",
-                "meal": "lunch"
-            }
+            "example": {"dish": "aloo paratha", "meal": "lunch"}
         }
+
+
+class PreviewMeta(BaseModel):
+    model: str
+    generated_at: str  # ISO datetime string
 
 
 class PreviewResponse(BaseModel):
@@ -26,32 +28,22 @@ class PreviewResponse(BaseModel):
     dish: str
     calories: int
     image_url: str
-    captions: Dict[str, str]  # {"bhai": "...", "formal": "..."}
-    meta: Dict[str, str]      # {"model": "openai-gpt-4o-mini"}
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "dish": "aloo paratha",
-                "calories": 320,
-                "image_url": "/data/images/aloo_paratha_123456.png",
-                "captions": {
-                    "bhai": "Bhai, yeh aloo paratha full mazedaar hai - calories thodi zyada but worth it!",
-                    "formal": "Aloo paratha is a nutritious stuffed flatbread providing good energy for lunch."
-                },
-                "meta": {
-                    "model": "openai-gpt-4o-mini",
-                    "generated_at": "2024-01-15T10:30:00Z"
-                }
-            }
-        }
+    captions: Dict[str, str]
+    meta: PreviewMeta
+
+
+class CompareMeta(BaseModel):
+    model: str
+    generated_at: str
+    calorie_difference: int  # changed to int for numeric semantics
+    lighter_dish: Optional[str] = None
 
 
 class CompareRequest(BaseModel):
-    """Request model for dish comparison"""
+    """Request model for dish comparision"""
     dishA: str = Field(..., min_length=1, max_length=100, description="First dish name")
     dishB: str = Field(..., min_length=1, max_length=100, description="Second dish name")
-    
+
     class Config:
         schema_extra = {
             "example": {
@@ -63,23 +55,21 @@ class CompareRequest(BaseModel):
 
 class CompareResponse(BaseModel):
     """Response model for dish comparison"""
-    dishA: Dict[str, Any]     # {"name": "...", "calories": 320}
-    dishB: Dict[str, Any]     # {"name": "...", "calories": 280}
-    suggestion: str           # Bhai-style recommendation
-    meta: Dict[str, str]
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "dishA": {"name": "rajma", "calories": 245},
-                "dishB": {"name": "dal tadka", "calories": 180},
-                "suggestion": "Bhai, dal tadka is lighter - better choice if gym ka plan hai!",
-                "meta": {
-                    "model": "openai-gpt-4o-mini",
-                    "generated_at": "2024-01-15T10:30:00Z"
-                }
-            }
-        }
+    dishA: Dict[str, Any]
+    dishB: Dict[str, Any]
+    suggestion: str
+    meta: CompareMeta
+
+
+class WeeklyMeta(BaseModel):
+    model: str
+    generated_at: str
+    meal_count: int
+    unique_dishes: int
+    avg_calories_per_day: int
+    days_in_range: int
+    most_consumed_dish: Optional[str] = None
+    most_consumed_count: int
 
 
 class WeeklyResponse(BaseModel):
@@ -87,25 +77,8 @@ class WeeklyResponse(BaseModel):
     total_calories: int
     chart_url: str
     summary: str
-    date_range: Dict[str, str]  # {"start": "...", "end": "..."}
-    meta: Dict[str, str]
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "total_calories": 14700,
-                "chart_url": "/data/images/weekly_chart_20240115.png",
-                "summary": "Your weekly intake shows consistent patterns with an average of 2100 calories per day. The distribution is well-balanced across meals with moderate variation.",
-                "date_range": {
-                    "start": "2024-01-08",
-                    "end": "2024-01-14"
-                },
-                "meta": {
-                    "model": "matplotlib",
-                    "generated_at": "2024-01-15T10:30:00Z"
-                }
-            }
-        }
+    date_range: Dict[str, str]
+    meta: WeeklyMeta
 
 
 class DishModel(BaseModel):
@@ -158,5 +131,5 @@ class UserMealEntry(BaseModel):
     """Model for user meal tracking"""
     dish_name: str
     meal_type: str
-    calories: int
+    calories: Optional[int] = None
     consumed_at: Optional[datetime] = None
