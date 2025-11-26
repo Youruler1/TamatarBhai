@@ -13,7 +13,7 @@
     "primary": "external",
     "external_api": "stability",
     "external_config": {
-      "engine": "stable-diffusion-2",
+      "engine": "stable-diffusion-xl-1024-v1-0",
       "api_key_env": "STABILITY_KEY"
     }
   }
