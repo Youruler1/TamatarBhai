@@ -1,0 +1,13 @@
+# TamatarBhai - TODOS
+
+## Backend
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+
+## Frontend
+- [ ]
+- [ ]
+- [ ]
+- [ ]
