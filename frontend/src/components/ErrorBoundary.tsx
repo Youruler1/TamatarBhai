@@ -1,7 +1,7 @@
 // ErrorBoundary Component
 // Catches React errors and displays fallback UI
 
-import { Component, ReactNode } from 'react';
+import { Component } from 'react';
 import { ErrorBoundaryProps, ErrorBoundaryState } from '../types/components';
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {

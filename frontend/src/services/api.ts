@@ -5,7 +5,6 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import {
   PreviewRequest,
   PreviewResponse,
-  CompareRequest,
   CompareResponse,
   WeeklyResponse,
   Dish,
