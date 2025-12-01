@@ -75,7 +75,7 @@ Tamatar-Bhai is a 1-day MVP web application that provides AI-powered food insigh
 2. WHEN backend is implemented THEN it SHALL use FastAPI framework
 3. WHEN data storage is needed THEN system SHALL use SQLite database
 4. WHEN containerization is required THEN system SHALL use Docker + docker-compose
-5. WHEN text generation is needed THEN system SHALL use OpenAI gpt-4o-mini
+5. WHEN text generation is needed THEN system SHALL use OpenAI gpt-oss-120b
 6. WHEN image generation is needed THEN system SHALL use StabilityAI stable-diffusion-2
 7. WHEN charts are generated THEN system SHALL use matplotlib to create PNG files
 

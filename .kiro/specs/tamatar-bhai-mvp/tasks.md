@@ -1,203 +1,372 @@
-# Implementation Plan
-
-- [x] 1. Set up project structure and core configuration
-
-
-  - Create directory structure for backend/, frontend/, data/ folders
-  - Set up Docker configuration files (Dockerfiles, docker-compose.yml)
-  - Create environment configuration files (.env.example)
-  - Initialize package.json for frontend and requirements.txt for backend
-  - _Requirements: 6.1, 6.2, 6.3, 7.6, 11.1, 11.2, 11.3_
-
-- [x] 2. Create nutrition lookup data and database schema
-
-
-  - Generate nutrition_lookup.csv with 50+ Indian dishes and calorie data
-  - Create SQLite database schema with dishes, cache, and user_meals tables
-  - Implement database initialization scripts
-  - Set up data directory structure with images/ subdirectory
-  - _Requirements: 8.1, 8.2, 8.3_
-
-- [x] 3. Implement backend API foundation
-
-
-  - Set up FastAPI application with basic configuration
-  - Create model_routes.json configuration file for external API routing
-  - Implement database connection and ORM models using SQLAlchemy
-  - Create basic API endpoint structure with proper error handling
-  - _Requirements: 6.2, 7.6, 10.4_
-
-- [x] 4. Build external API integration services
-
-
-  - Implement OpenAI service class with gpt-4o-mini integration
-  - Create StabilityAI service class with stable-diffusion-2 integration
-  - Implement proper API key management from environment variables
-  - Add fallback mechanisms for API failures
-  - _Requirements: 6.5, 6.6, 7.7, 10.1, 10.2, 10.3_
-
-- [x] 5. Implement "bhai style" caption generation
-
-  - Create explicit bhai style persona definition for OpenAI prompts
-  - Implement bhai-style caption generation with few-shot prompting
-  - Implement formal caption generation
-  - Test and validate bhai style output matches requirements
-  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
-
-- [x] 6. Build nutrition lookup and caching system
-
-
-  - Implement fuzzy string matching for dish name lookup
-  - Create caching manager for storing generated content
-  - Implement cache invalidation and TTL management
-  - Add database operations for cache management
-  - _Requirements: 8.4, 8.5, 2.6_
-
-- [x] 7. Implement Daily Preview API endpoint
-
-
-  - Create POST /api/preview endpoint with request/response models
-  - Integrate image generation with StabilityAI
-  - Implement image saving to data/images/ directory
-  - Add calorie lookup with fuzzy matching
-  - Generate both bhai and formal captions
-  - Implement caching for complete preview responses
-  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 7.1_
-
-- [x] 8. Implement Switch-up Diff API endpoint
-
-
-  - Create POST /api/compare endpoint with request/response models
-  - Implement calorie retrieval for both dishes
-  - Generate bhai-style comparison suggestion using OpenAI
-  - Add proper error handling and validation
-  - _Requirements: 2.1, 2.2, 2.3, 7.3_
-
-- [x] 9. Implement Weekly Snapshot API endpoint
-
-
-  - Create GET /api/weekly endpoint with date range parameters
-  - Implement calorie calculation for date ranges
-  - Create matplotlib chart generation for weekly data
-  - Generate formal summary using OpenAI
-  - Save charts as PNG files and return URLs
-  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 6.7, 7.4_
-
-- [x] 10. Implement admin management endpoints
-
-  - Create POST /admin/dish endpoint for adding/editing dishes
-  - Implement POST /admin/cache/clear endpoint for cache management
-  - Add proper validation and error handling for admin operations
-  - Provide confirmation feedback for admin actions
-  - _Requirements: 4.1, 4.2, 4.3, 4.4, 7.5_
-
-- [x] 11. Build React frontend foundation
-
-
-
-  - Initialize React + Vite project with TypeScript
-  - Set up component structure and routing
-  - Implement tab-based navigation (Daily Preview, Switch-up, Weekly)
-  - Create shared components (LoadingSkeleton, ErrorBoundary, ImageWithFallback)
-  - Add basic styling with CSS or Tailwind
-  - _Requirements: 6.1, 9.1, 9.2_
-
-- [x] 12. Implement Daily Preview frontend component
-
-
-
-  - Create DailyPreview component with dish and meal input forms
-  - Implement API integration for preview generation
-  - Add loading skeletons during API calls
-  - Display generated image, calories, and both caption styles
-  - Handle error states and fallback content
-  - _Requirements: 1.7, 9.3, 10.1_
-
-- [x] 13. Implement Switch-up Diff frontend component
-
-
-
-
-  - Create SwitchupDiff component with two dish input fields
-  - Implement API integration for dish comparison
-  - Display calories for both dishes and bhai-style suggestion
-  - Add loading states and error handling
-  - _Requirements: 2.3, 9.3_
-
-
-
-
-- [ ] 14. Implement Weekly Snapshot frontend component
-  - Create WeeklySnapshot component with date range picker
-  - Implement API integration for weekly data retrieval
-  - Display generated chart and formal summary
-
-
-
-  - Add loading states and proper error handling
-  - _Requirements: 3.5, 9.3_
-
-- [x] 15. Add API attribution and loading states
-
-
-
-  - Include "Generated by OpenAI / StabilityAI" footnotes on all generated content
-  - Implement comprehensive loading skeletons for all API operations
-  - Add proper error messages and retry mechanisms
-  - Ensure graceful degradation when APIs are unavailable
-  - _Requirements: 9.4, 9.3, 10.1, 10.2, 10.3_
-
-
-
-- [x] 16. Implement Docker containerization
-
-  - Create Dockerfile for backend with FastAPI and dependencies
-  - Create Dockerfile for frontend with React build process
-  - Configure docker-compose.yml with proper service dependencies
-  - Set up volume mounting for data persistence
-
-
-  - Test container builds and inter-service communication
-  - _Requirements: 6.4, 11.2, 11.6_
-
-
-
-- [ ] 17. Create demo script and documentation
-  - Write comprehensive README.md with setup instructions
-  - Create run_demo.sh script for easy application startup
-
-  - Document API endpoints and usage examples
-  - Include demo flow instructions for testing all features
-  - Add troubleshooting section for common issues
-
-
-  - _Requirements: 11.4, 11.5_
-
-- [ ] 18. Implement comprehensive error handling and testing
-  - Add proper error handling for all API endpoints
-  - Implement fallback mechanisms for external API failures
-  - Create unit tests for critical backend functions
-
-
-  - Test frontend components with mock API responses
-  - Verify application works without crashes when APIs fail
-  - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
-
-- [ ] 19. Final integration testing and optimization
-  - Test complete application flow from docker-compose up
-
-
-
-  - Verify all features work end-to-end
-  - Test with actual OpenAI and StabilityAI API calls
-  - Optimize performance and loading times
-  - Ensure application is accessible at http://localhost:3000
-  - _Requirements: 11.6, 9.5_
-
-- [ ] 20. Polish UI and prepare for demo
-  - Apply final styling and ensure clean card-based design
-  - Test responsive design on different screen sizes
-  - Verify all loading states and error messages are user-friendly
-  - Ensure smooth navigation between tabs
-  - Prepare sample data and demo scenarios
-  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+# Implementation Plan - Frontend Development
+
+## Overview
+Build a complete React + Vite + TypeScript frontend from scratch for the Tamatar-Bhai MVP. The backend APIs are tested and working. This plan focuses on creating a polished, functional frontend with proper testing and deployment configuration.
+
+---
+
+## Phase 1: Project Setup & Configuration
+
+### Task 1: Initialize Frontend Project Structure
+- [ ] 1.1 Create `frontend/` directory in project root
+- [ ] 1.2 Initialize Vite + React + TypeScript project
+  ```bash
+  npm create vite@latest frontend -- --template react-ts
+  ```
+- [ ] 1.3 Install core dependencies
+  - React Router DOM for navigation
+  - Axios for API calls
+  - Lucide React for icons
+  - Date-fns for date handling
+- [ ] 1.4 Install TailwindCSS and configure
+- [ ] 1.5 Create `.env.example` with `VITE_API_BASE_URL=http://localhost:8000`
+- [ ] 1.6 Set up project folder structure:
+  ```
+  frontend/
+  ├── src/
+  │   ├── components/     # Reusable components
+  │   ├── pages/          # Page components
+  │   ├── services/       # API service layer
+  │   ├── types/          # TypeScript interfaces
+  │   ├── utils/          # Helper functions
+  │   ├── App.tsx
+  │   ├── main.tsx
+  │   └── index.css
+  ├── public/
+  ├── Dockerfile
+  ├── package.json
+  ├── tsconfig.json
+  ├── vite.config.ts
+  └── tailwind.config.js
+  ```
+- _Requirements: 6.1, 9.1, 9.2, 11.1_
+
+### Task 2: Create TypeScript Type Definitions
+- [ ] 2.1 Create `src/types/api.ts` with all API interfaces
+  - PreviewRequest, PreviewResponse
+  - CompareRequest, CompareResponse
+  - WeeklyResponse
+  - DishModel, ErrorResponse
+- [ ] 2.2 Create `src/types/components.ts` for component props
+- _Requirements: 6.1_
+
+### Task 3: Build API Service Layer
+- [ ] 3.1 Create `src/services/api.ts` with axios instance
+- [ ] 3.2 Configure base URL from environment variables
+- [ ] 3.3 Add request/response interceptors for logging
+- [ ] 3.4 Implement API methods:
+  - `generatePreview(dish, meal)`
+  - `compareDishes(dishA, dishB)`
+  - `getWeeklySnapshot(startDate, endDate)`
+  - `getDishes()`
+  - `addDish(dish)`
+  - `clearCache(dishName)`
+  - `healthCheck()`
+- [ ] 3.5 Add proper error handling and timeout configuration (30s)
+- _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 10.1_
+
+---
+
+## Phase 2: Shared Components
+
+### Task 4: Create Reusable UI Components
+- [ ] 4.1 Create `src/components/LoadingSkeleton.tsx`
+  - Support types: 'card', 'chart', 'text'
+  - Animated shimmer effect
+- [ ] 4.2 Create `src/components/ErrorBoundary.tsx`
+  - Catch React errors
+  - Display fallback UI
+  - Log errors to console
+- [ ] 4.3 Create `src/components/ImageWithFallback.tsx`
+  - Handle image loading errors
+  - Show placeholder on failure
+  - Support lazy loading
+- [ ] 4.4 Create `src/components/TabNavigation.tsx`
+  - Three tabs: Daily Preview, Switch-up, Weekly
+  - Active state styling
+  - Responsive design
+- _Requirements: 9.1, 9.2, 9.3, 10.1_
+
+---
+
+## Phase 3: Feature Pages
+
+### Task 5: Build Daily Preview Page
+- [ ] 5.1 Create `src/pages/DailyPreview.tsx`
+- [ ] 5.2 Implement form with:
+  - Dish name input (text field)
+  - Meal type selector (breakfast, lunch, dinner, snack)
+  - Submit button with loading state
+  - Reset button
+- [ ] 5.3 Display preview results:
+  - Dish image (with fallback)
+  - Calorie count (prominent display)
+  - Bhai-style caption (styled card)
+  - Formal caption (styled card)
+  - Matched dish info (if fuzzy matched)
+- [ ] 5.4 Add loading skeleton during API call
+- [ ] 5.5 Add error handling with retry button
+- [ ] 5.6 Add API attribution footer: "Generated by OpenAI & StabilityAI"
+- [ ] 5.7 Add empty state with helpful instructions
+- _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 9.3, 9.4, 10.1_
+
+### Task 6: Build Switch-up Diff Page
+- [ ] 6.1 Create `src/pages/SwitchupDiff.tsx`
+- [ ] 6.2 Implement form with:
+  - First dish input
+  - Second dish input
+  - Swap button (to switch dishes)
+  - Compare button with loading state
+  - Reset button
+- [ ] 6.3 Display comparison results:
+  - Side-by-side dish cards with calories
+  - Visual calorie difference indicator
+  - Bhai-style recommendation (prominent card)
+  - Matched dish info for both dishes
+- [ ] 6.4 Add loading skeleton during API call
+- [ ] 6.5 Add error handling with retry button
+- [ ] 6.6 Add API attribution footer
+- [ ] 6.7 Add empty state with helpful instructions
+- _Requirements: 2.1, 2.2, 2.3, 9.3, 9.4, 10.1_
+
+### Task 7: Build Weekly Snapshot Page
+- [ ] 7.1 Create `src/pages/WeeklySnapshot.tsx`
+- [ ] 7.2 Implement form with:
+  - Start date picker
+  - End date picker
+  - Generate button with loading state
+  - Reset button
+- [ ] 7.3 Display weekly results:
+  - Total calories (large display)
+  - Average calories per day
+  - Chart image (from backend)
+  - Formal summary text
+  - Additional stats (meal count, unique dishes, most consumed)
+- [ ] 7.4 Add date validation (end >= start, not future dates)
+- [ ] 7.5 Add loading skeleton during API call
+- [ ] 7.6 Add error handling with retry button
+- [ ] 7.7 Add API attribution footer
+- [ ] 7.8 Add empty state with helpful instructions
+- [ ] 7.9 Handle "no data" scenario gracefully
+- _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 9.3, 9.4, 10.1_
+
+---
+
+## Phase 4: Main Application
+
+### Task 8: Build Main App Component
+- [ ] 8.1 Create `src/App.tsx` with:
+  - Header with logo and title
+  - Tab navigation
+  - Main content area (renders active tab)
+  - Footer with attribution
+- [ ] 8.2 Implement tab state management
+- [ ] 8.3 Wrap app in ErrorBoundary
+- [ ] 8.4 Add responsive layout (mobile-friendly)
+- [ ] 8.5 Create `src/App.css` with:
+  - Global styles
+  - Animation keyframes
+  - Utility classes
+- _Requirements: 9.1, 9.2, 9.4_
+
+### Task 9: Configure Styling
+- [ ] 9.1 Set up TailwindCSS configuration
+- [ ] 9.2 Create `src/index.css` with:
+  - Tailwind directives
+  - Custom CSS variables
+  - Global resets
+- [ ] 9.3 Add custom color palette (tomato theme)
+- [ ] 9.4 Configure responsive breakpoints
+- [ ] 9.5 Add animation utilities
+- _Requirements: 9.2_
+
+---
+
+## Phase 5: Docker & Deployment
+
+### Task 10: Create Frontend Dockerfile
+- [ ] 10.1 Create `frontend/Dockerfile` with multi-stage build:
+  - Stage 1: Build React app
+  - Stage 2: Serve with nginx
+- [ ] 10.2 Create `frontend/.dockerignore`
+- [ ] 10.3 Create nginx configuration for SPA routing
+- [ ] 10.4 Test Docker build locally
+- _Requirements: 6.4, 11.2_
+
+### Task 11: Update Docker Compose Configuration
+- [ ] 11.1 Update `docker-compose.yml` to include frontend service
+- [ ] 11.2 Configure frontend to depend on backend
+- [ ] 11.3 Set up proper networking between services
+- [ ] 11.4 Configure volume mounts for development
+- [ ] 11.5 Set environment variables
+- [ ] 11.6 Test full stack with `docker-compose up --build`
+- _Requirements: 6.4, 11.2, 11.6_
+
+---
+
+## Phase 6: Testing & Quality Assurance
+
+### Task 12: Manual Testing
+- [ ] 12.1 Test Daily Preview feature:
+  - Valid dish names
+  - Invalid dish names
+  - Empty inputs
+  - API failures
+  - Loading states
+  - Image fallbacks
+- [ ] 12.2 Test Switch-up Diff feature:
+  - Valid comparisons
+  - Same dish comparison
+  - Empty inputs
+  - Swap functionality
+  - API failures
+- [ ] 12.3 Test Weekly Snapshot feature:
+  - Valid date ranges
+  - Invalid date ranges
+  - No data scenarios
+  - Future dates
+  - API failures
+- [ ] 12.4 Test responsive design on different screen sizes
+- [ ] 12.5 Test browser compatibility (Chrome, Firefox, Safari)
+- [ ] 12.6 Test error boundaries
+- _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
+
+### Task 13: Create Test Scripts
+- [ ] 13.1 Create `tests/test_frontend_manual.md` with test cases
+- [ ] 13.2 Create `tests/test_api_integration.sh` for API testing
+- [ ] 13.3 Document expected behaviors
+- [ ] 13.4 Create troubleshooting guide
+- _Requirements: 11.5_
+
+---
+
+## Phase 7: Documentation & Demo
+
+### Task 14: Update Documentation
+- [ ] 14.1 Update `README.md` with:
+  - Complete setup instructions
+  - Frontend-specific configuration
+  - Development workflow
+  - Troubleshooting section
+- [ ] 14.2 Create `frontend/README.md` with:
+  - Component documentation
+  - API service usage
+  - Development guidelines
+- [ ] 14.3 Update `.env.example` with all required variables
+- [ ] 14.4 Document the "bhai style" personality in user-facing docs
+- _Requirements: 11.5_
+
+### Task 15: Create Demo Script
+- [ ] 15.1 Create `run_demo.sh` script that:
+  - Checks prerequisites (Docker, API keys)
+  - Builds and starts services
+  - Waits for services to be ready
+  - Opens browser to http://localhost:3000
+  - Shows helpful messages
+- [ ] 15.2 Make script executable
+- [ ] 15.3 Test on clean environment
+- [ ] 15.4 Create `DEMO_FLOW.md` with step-by-step demo instructions
+- _Requirements: 11.4, 11.5_
+
+### Task 16: Create Demo Scenarios
+- [ ] 16.1 Update `demo_scenarios.json` with:
+  - Sample dish names for testing
+  - Expected results
+  - Edge cases to demonstrate
+- [ ] 16.2 Create visual demo guide with screenshots
+- _Requirements: 11.5_
+
+---
+
+## Phase 8: Final Polish & Optimization
+
+### Task 17: Performance Optimization
+- [ ] 17.1 Implement lazy loading for images
+- [ ] 17.2 Add debouncing for API calls
+- [ ] 17.3 Optimize bundle size
+- [ ] 17.4 Add loading indicators for all async operations
+- [ ] 17.5 Test performance with slow network
+- _Requirements: 9.3, 10.1_
+
+### Task 18: Accessibility & UX Improvements
+- [ ] 18.1 Add proper ARIA labels
+- [ ] 18.2 Ensure keyboard navigation works
+- [ ] 18.3 Add focus indicators
+- [ ] 18.4 Test with screen readers
+- [ ] 18.5 Add helpful tooltips
+- [ ] 18.6 Improve error messages
+- _Requirements: 9.2, 9.3_
+
+### Task 19: Final Integration Testing
+- [ ] 19.1 Test complete flow: docker-compose up → use all features
+- [ ] 19.2 Verify all API endpoints work correctly
+- [ ] 19.3 Test with actual OpenAI and StabilityAI API calls
+- [ ] 19.4 Verify caching works correctly
+- [ ] 19.5 Test error scenarios (API failures, network issues)
+- [ ] 19.6 Verify application is accessible at http://localhost:3000
+- [ ] 19.7 Test data persistence across restarts
+- _Requirements: 11.6, 10.1, 10.2, 10.3_
+
+### Task 20: Prepare for Demo
+- [ ] 20.1 Clean up console logs
+- [ ] 20.2 Verify all loading states are smooth
+- [ ] 20.3 Ensure error messages are user-friendly
+- [ ] 20.4 Test smooth navigation between tabs
+- [ ] 20.5 Prepare sample data for demo
+- [ ] 20.6 Create quick start guide
+- [ ] 20.7 Record demo video (optional)
+- _Requirements: 9.1, 9.2, 9.3, 9.4, 11.5_
+
+---
+
+## Success Criteria
+
+### Functional Requirements
+✅ All three main features work (Daily Preview, Switch-up, Weekly)
+✅ API integration is complete and tested
+✅ Error handling works gracefully
+✅ Loading states are implemented
+✅ Caching is transparent to user
+
+### Technical Requirements
+✅ Docker containerization works
+✅ Application runs with `docker-compose up --build`
+✅ Frontend accessible at http://localhost:3000
+✅ Backend accessible at http://localhost:8000
+✅ No crashes even when APIs fail
+
+### UX Requirements
+✅ Clean, minimal design with cards
+✅ Tab navigation is intuitive
+✅ Loading skeletons during API calls
+✅ API attribution is visible
+✅ Responsive design works on mobile
+
+### Documentation Requirements
+✅ README has complete setup instructions
+✅ Demo script works on clean environment
+✅ Troubleshooting guide is helpful
+✅ Code is well-commented
+
+---
+
+## Notes
+
+- **Backend is already tested and working** - focus on frontend only
+- **Use the existing backend API** - no backend changes needed
+- **Follow the design.md specifications** for component interfaces
+- **Prioritize working functionality** over perfect styling
+- **Test frequently** to catch issues early
+- **Keep it simple** - this is a 1-day MVP
+
+---
+
+## Estimated Timeline
+
+- **Phase 1-2**: 2-3 hours (Setup & Shared Components)
+- **Phase 3**: 4-5 hours (Feature Pages - main work)
+- **Phase 4**: 1 hour (Main App)
+- **Phase 5**: 1-2 hours (Docker & Deployment)
+- **Phase 6-8**: 2-3 hours (Testing, Docs, Polish)
+
+**Total**: ~10-14 hours of focused development
