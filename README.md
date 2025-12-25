@@ -298,9 +298,3 @@ This is a 1-day MVP. For production use:
 ## 📄 License
 
 MIT License - See LICENSE file for details
-
----
-
-**Built with ❤️ for the Tamatar-Bhai community**
-
-*"Bhai, khana khao aur mast raho!" 🍽️*
